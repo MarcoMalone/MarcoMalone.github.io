@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on Marco Di Leo</title>
+    <link>/project/</link>
+    <description>Recent content in Projects on Marco Di Leo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Tue, 01 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Project 2</title>
+      <link>/project/project2/</link>
+      <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description> Test Project 2  </description>
+    </item>
+    
+    <item>
+      <title>Project 1 - Report</title>
+      <link>/project/project1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>Title and Introduction We will be exploring temperature anomalies and their relationship with CO2 levels in the atmosphere. We got our datasets from datahub and they can be found at temp anomalies and CO2 PPM. The datasets have annual averages of CO2 levels based on daily averages, annual increases in mole fractions of CO2, and temperature anomalies in various locations of the globe, all plotted by year. These datasets are interesting to me because I have always been interested in climate data and especially climate change and its impact.</description>
+    </item>
+    
+  </channel>
+</rss>
