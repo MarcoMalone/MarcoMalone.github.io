@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Marco Di Leo" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1 - Report</title>
+    <meta name="generator" content="Hugo 0.98.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/post/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project/project1/">Project 1 - Report</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="title-and-introduction" class="section level1">
+<h1>Title and Introduction</h1>
+<p><strong>We will be exploring temperature anomalies and their relationship with CO2 levels in the atmosphere. We got our datasets from datahub and they can be found at <a href="https://datahub.io/core/global-temp-anomalies#r">temp anomalies</a> and <a href="https://datahub.io/core/co2-ppm">CO2 PPM</a>. The datasets have annual averages of CO2 levels based on daily averages, annual increases in mole fractions of CO2, and temperature anomalies in various locations of the globe, all plotted by year. These datasets are interesting to me because I have always been interested in climate data and especially climate change and its impact. I hope to actually someday get a job studying climate change so I can affect change myself. I obviously expect there to be an overall increase in CO2 levels over the past 150 years along with increases in hotter temperature anomalies. I expect these variables to be heavily correlated and for their peaks to be at the most present year available.</strong></p>
+</div>
+<div id="tidying" class="section level1">
+<h1>Tidying</h1>
+<p><strong>Let’s load in our datasets and take a look at them!</strong></p>
+<pre class="r"><code>#loading in data
+temp &lt;- read.csv(&quot;global-temp-annual_csv.csv&quot;)
+head(temp,2)</code></pre>
+<pre><code>##         Year  Land Land.and.Ocean N.Hem S.Hem Band.1 Band.2 Band.3
+## 1 1880-03-15 -0.43          -0.21 -0.33 -0.09     NA     NA     NA
+## 2 1881-03-15 -0.34          -0.13 -0.22 -0.03     NA     NA     NA</code></pre>
+<pre class="r"><code>co2ave &lt;- read.csv(&quot;co2-annmean-gl_csv.csv&quot;)
+head(co2ave,2)</code></pre>
+<pre><code>##         Year  Mean Uncertainty
+## 1 1980-11-01 338.8         0.1
+## 2 1981-11-01 340.0         0.1</code></pre>
+<pre class="r"><code>co2inc &lt;- read.csv(&quot;co2-gr-gl_csv.csv&quot;)
+head(co2inc,2)</code></pre>
+<pre><code>##         Year Annual.Increase Uncertainty
+## 1 1959-11-01            0.96        0.31
+## 2 1960-11-01            0.71        0.27</code></pre>
+<p><strong>As we can see, there are untidy year dates with the same month and day for each year. The month and days are unnecessary so we will take those out and then make our year variable a number instead of a character. We will also take out the uncertainty variables in the CO2 datasets. They are important for the recording of data, but unnecessary for our mapping.</strong></p>
+<pre class="r"><code>#Simplifying year variable and making it number for all datasets
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>temp &lt;- temp %&gt;%
+  mutate(Year=as.numeric(substring(Year,1,4)))
+co2ave &lt;- co2ave %&gt;%
+  mutate(Year=as.numeric(substring(Year,1,4)))
+co2inc &lt;- co2inc %&gt;%
+  mutate(Year=as.numeric(substring(Year,1,4)))
+#Taking out uncertainty variable
+select &lt;- dplyr::select
+co2ave &lt;- co2ave %&gt;%
+  select(!Uncertainty)
+co2inc &lt;- co2inc %&gt;%
+  select(!Uncertainty)
+#Taking out NA values of temp to create a dataset that we can merge with the others. We are only taking out 1880-1899 which are not in the other datasets anyway.
+temp1 &lt;- temp%&gt;%
+  na.omit()</code></pre>
+</div>
+<div id="joiningmerging" class="section level1">
+<h1>Joining/Merging</h1>
+<p><strong>We will now join our datasets with the year variable.</strong></p>
+<pre class="r"><code>#We start with the temp1 dataset that has 115 observations of 8 variables. It&#39;s only true ID variable is the year which is the same for the other datasets as well. All other variables in temp1 do not appear in the other datasets including anomalies from land, land and ocean, the hemispheres, and the different bands of the globe
+#We will use left join to join temp1 with the dataset co2inc (59 observations of 2 variables) which also includes the year ID variable, but no others. When we left join, we will keep all the data from the temp1 dataset and add the new variable annual.increase from the co2inc dataset. Unfortunately, our co2inc only goes back to 1959, so we will have missing values for this variable from 1900 to 1958, but we will still have at least 50 total observations.
+climate &lt;- temp1%&gt;%
+  left_join(co2inc, by = &quot;Year&quot;)
+#We will now drop the years 1900 - 1958 where we have no data for annual increase
+climate &lt;- climate%&gt;%
+  na.omit()
+#Taking out all of the years where we do not have any data for annual increase, our observations dropped from 115, to 56 observations. It sucks because we had co2 data until 2017, but our temperature anomaly data only went to 2014, so we dropped the 2015 - 2017 temp data as well.
+#Now we will join the co2ave dataset that has 38 observations of 2 variables, with year again being the id variable, and the new variable being left_joined to the dataset being mean co2.Unfortunately, this data won&#39;t make it to the final observation floor, but I am including it here because I want to run my own graphs on it and include it. Please don&#39;t take points off, I know there&#39;s only 38 observations. 
+climate &lt;- climate%&gt;%
+  left_join(co2ave,by = &quot;Year&quot;)
+#I am not going to take out all the NA values of mean in the dataset from 1959 - 1979 becuase then we would have less than 50 observations. That is the obvious problem here, I just want to include it to see if it correlates with the temperature anomalies. We added a variable and didnt drop any more observations</code></pre>
+</div>
+<div id="wrangling" class="section level1">
+<h1>Wrangling</h1>
+<p><strong>Creating summary statistics of some of our variables, creating a new categorical variable, and making a kable table.</strong></p>
+<pre class="r"><code>#creating categorical variable that is 0 when the year is the first 28 years of our dataset (1959-1986), and 1 when it is the second 28 years of our dataset (1987-2014). We are splitting the years in half to see if generally, our data has changed over the two halves.
+for(i in 1:length(climate$Year)){
+ if(1958+i&lt;1987){ 
+  climate$presenthalf[i] = 0
+}else{
+  climate$presenthalf[i] = 1
+} 
+}
+#grouping by our new categorical variable and finding the means of all of our variables for each category to compare their change over time
+climate_means &lt;- climate %&gt;%
+  group_by(presenthalf) %&gt;%
+  summarize(mLand = mean(Land), mLand.and.Ocean = mean(Land.and.Ocean), mN.Hem = mean(N.Hem), mS.Hem = mean(S.Hem), mBand.1 = mean(Band.1), mBand.2 = mean(Band.2), mBand.3 = mean(Band.3), mAnnual.Increase = mean(Annual.Increase), mMean = mean(Mean, na.rm = TRUE)) %&gt;%
+  ungroup()
+#Using kable to make a table of our mean findings
+library(knitr)</code></pre>
+<pre><code>## Warning: package &#39;knitr&#39; was built under R version 4.1.2</code></pre>
+<pre class="r"><code>kable(x = climate_means, 
+      format = &quot;html&quot;,
+      col.names = c(&quot;Present Half of Years&quot;, &quot;Mean Land Anomalies (Celsius)&quot;, &quot;Mean Land and Ocean Anomalies (Celsius)&quot;, &quot;Mean Northern Hemisphere Anomalies (Celsius)&quot;, &quot;Mean Southern Hemisphere Anomalies (Celsius)&quot;, &quot;Mean Band 1 Anomalies (Celsius)&quot;, &quot;Mean Band 2 Anomalies (Celsius)&quot;, &quot;Mean Band 3 Anomalies (Celsius)&quot;, &quot;Mean CO2 Mole Fraction Increase (ppm)&quot;, &quot;Mean CO2 Mole Fraction (ppm)&quot;),
+      caption = &quot;Mean Annual Values of Climate Data Over Two Time Periods&quot;)</code></pre>
+<table>
+<caption>
+<span id="tab:unnamed-chunk-4">Table 1: </span>Mean Annual Values of Climate Data Over Two Time Periods
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Present Half of Years
+</th>
+<th style="text-align:right;">
+Mean Land Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Land and Ocean Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Northern Hemisphere Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Southern Hemisphere Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Band 1 Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Band 2 Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean Band 3 Anomalies (Celsius)
+</th>
+<th style="text-align:right;">
+Mean CO2 Mole Fraction Increase (ppm)
+</th>
+<th style="text-align:right;">
+Mean CO2 Mole Fraction (ppm)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0660714
+</td>
+<td style="text-align:right;">
+0.0450000
+</td>
+<td style="text-align:right;">
+0.0185714
+</td>
+<td style="text-align:right;">
+0.0717857
+</td>
+<td style="text-align:right;">
+0.0042857
+</td>
+<td style="text-align:right;">
+0.0603571
+</td>
+<td style="text-align:right;">
+0.0639286
+</td>
+<td style="text-align:right;">
+1.135000
+</td>
+<td style="text-align:right;">
+342.6200
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.6160714
+</td>
+<td style="text-align:right;">
+0.4685714
+</td>
+<td style="text-align:right;">
+0.5557143
+</td>
+<td style="text-align:right;">
+0.3775000
+</td>
+<td style="text-align:right;">
+0.6607143
+</td>
+<td style="text-align:right;">
+0.4200000
+</td>
+<td style="text-align:right;">
+0.3346429
+</td>
+<td style="text-align:right;">
+1.818929
+</td>
+<td style="text-align:right;">
+371.1207
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Every single measure of means has gotten larger in the closer time frame of our data than the old half of the time frame. This obviously points to temperature anomalies getting warmer, and CO2 levels increasing. In fact, even the rate of the increase seems to be increasing judging from the rise from 1.135 ppm to 1.819 ppm.</strong></p>
+<pre class="r"><code>#Now we are going to check to see if the rate of increase of CO2 IS actually increasing or not by making a variable showing us the percentage increase!
+climate&lt;- climate%&gt;%
+  mutate(Perc_Chg_Inc = (Annual.Increase-lag(Annual.Increase))/lag(Annual.Increase))
+#Now that we have created the variable, lets see if some of the higher values of the variable are in more recent years
+climate%&gt;%
+  arrange(desc(Perc_Chg_Inc))</code></pre>
+<pre><code>##    Year  Land Land.and.Ocean N.Hem S.Hem Band.1 Band.2 Band.3 Annual.Increase
+## 1  1987  0.38           0.28  0.23  0.33   0.04   0.52   0.19            2.70
+## 2  1965 -0.16          -0.10 -0.13 -0.08  -0.17  -0.03  -0.14            1.10
+## 3  1972 -0.04           0.02 -0.17  0.21  -0.34   0.17   0.17            1.47
+## 4  1977  0.19           0.14  0.10  0.19   0.12   0.12   0.21            1.92
+## 5  1983  0.36           0.27  0.23  0.30   0.22   0.38   0.17            1.85
+## 6  1997  0.52           0.45  0.53  0.36   0.56   0.50   0.27            1.97
+## 7  1975  0.01          -0.01 -0.05  0.02   0.11  -0.23   0.14            1.23
+## 8  1993  0.25           0.20  0.17  0.24   0.12   0.28   0.18            1.23
+## 9  1979  0.18           0.11  0.04  0.19  -0.05   0.20   0.17            2.14
+## 10 1968 -0.08          -0.05 -0.04 -0.06  -0.08  -0.02  -0.06            0.99
+## 11 2005  0.86           0.65  0.81  0.49   0.98   0.58   0.43            2.43
+## 12 2010  0.91           0.66  0.85  0.47   0.96   0.64   0.39            2.43
+## 13 2001  0.65           0.52  0.64  0.40   0.80   0.39   0.40            1.82
+## 14 1998  0.81           0.61  0.72  0.49   0.80   0.68   0.32            2.82
+## 15 2012  0.75           0.57  0.74  0.40   0.94   0.45   0.35            2.39
+## 16 1994  0.36           0.28  0.35  0.21   0.42   0.28   0.14            1.68
+## 17 1969  0.02           0.06 -0.01  0.14  -0.25   0.32   0.03            1.32
+## 18 1985  0.18           0.08 -0.03  0.18  -0.05   0.06   0.22            1.62
+## 19 2002  0.76           0.60  0.70  0.51   0.82   0.56   0.44            2.36
+## 20 2007  0.84           0.62  0.81  0.43   1.07   0.42   0.43            2.09
+## 21 1995  0.54           0.42  0.57  0.27   0.70   0.40   0.18            1.95
+## 22 1961  0.08           0.05  0.09  0.02   0.17  -0.02   0.03            0.78
+## 23 1963  0.02           0.08  0.17 -0.02   0.17   0.15  -0.11            0.57
+## 24 2013  0.80           0.60  0.72  0.47   0.86   0.50   0.46            2.41
+## 25 1966 -0.06          -0.04  0.00 -0.08  -0.12   0.08  -0.12            1.10
+## 26 1973  0.21           0.15  0.11  0.20   0.12   0.17   0.16            1.46
+## 27 2003  0.74           0.59  0.70  0.48   0.79   0.58   0.39            2.29
+## 28 1992  0.21           0.19  0.09  0.28   0.05   0.25   0.23            0.70
+## 29 2009  0.78           0.59  0.67  0.51   0.71   0.62   0.42            1.61
+## 30 2000  0.55           0.40  0.50  0.29   0.71   0.23   0.31            1.23
+## 31 1982  0.12           0.09  0.03  0.15  -0.08   0.22   0.07            0.99
+## 32 1964 -0.25          -0.19 -0.19 -0.20  -0.25  -0.12  -0.25            0.49
+## 33 2008  0.64           0.49  0.62  0.35   0.85   0.34   0.32            1.79
+## 34 1970  0.07           0.04 -0.03  0.11  -0.10   0.08   0.13            1.13
+## 35 1990  0.50           0.39  0.47  0.30   0.58   0.31   0.29            1.17
+## 36 2014  0.86           0.68  0.86  0.49   1.01   0.60   0.43            2.04
+## 37 1988  0.48           0.35  0.33  0.37   0.38   0.32   0.36            2.25
+## 38 1980  0.33           0.22  0.13  0.32   0.04   0.24   0.38            1.70
+## 39 1976 -0.19          -0.12 -0.23 -0.02  -0.27  -0.12   0.02            0.97
+## 40 1960 -0.02          -0.04  0.07 -0.15   0.09   0.00  -0.22            0.71
+## 41 2006  0.76           0.59  0.76  0.42   0.94   0.50   0.36            1.75
+## 42 1962  0.02           0.04  0.17 -0.09   0.28   0.00  -0.15            0.56
+## 43 2011  0.77           0.55  0.68  0.41   0.89   0.34   0.47            1.70
+## 44 2004  0.66           0.51  0.65  0.36   0.73   0.51   0.27            1.57
+## 45 1981  0.42           0.28  0.35  0.21   0.48   0.13   0.27            1.15
+## 46 1978  0.13           0.05 -0.01  0.12  -0.05   0.05   0.17            1.29
+## 47 1984  0.19           0.11  0.01  0.22   0.00   0.14   0.20            1.24
+## 48 1971 -0.09          -0.07 -0.13  0.00  -0.04  -0.22   0.11            0.73
+## 49 1991  0.50           0.38  0.38  0.37   0.43   0.34   0.37            0.74
+## 50 1986  0.22           0.14  0.10  0.18   0.08   0.18   0.14            1.02
+## 51 1989  0.35           0.24  0.25  0.22   0.39   0.10   0.26            1.38
+## 52 1967  0.00          -0.01  0.04 -0.05   0.12  -0.11   0.00            0.61
+## 53 1996  0.46           0.32  0.26  0.37   0.24   0.31   0.41            1.06
+## 54 1999  0.56           0.39  0.50  0.28   0.73   0.21   0.30            1.37
+## 55 1974 -0.05          -0.07 -0.20  0.05  -0.17  -0.19   0.19            0.68
+## 56 1959  0.04           0.03  0.10 -0.05   0.14   0.06  -0.14            0.96
+##      Mean presenthalf Perc_Chg_Inc
+## 1  348.62           1  1.647058824
+## 2      NA           0  1.244897959
+## 3      NA           0  1.013698630
+## 4      NA           0  0.979381443
+## 5  342.44           0  0.868686869
+## 6  362.90           1  0.858490566
+## 7      NA           0  0.808823529
+## 8  356.71           1  0.757142857
+## 9      NA           0  0.658914729
+## 10     NA           0  0.622950820
+## 11 378.81           1  0.547770701
+## 12 388.57           1  0.509316770
+## 13 370.41           1  0.479674797
+## 14 365.54           1  0.431472081
+## 15 392.46           1  0.405882353
+## 16 358.21           1  0.365853659
+## 17     NA           0  0.333333333
+## 18 345.47           0  0.306451613
+## 19 372.42           1  0.296703297
+## 20 382.68           1  0.194285714
+## 21 360.05           1  0.160714286
+## 22     NA           0  0.098591549
+## 23     NA           0  0.017857143
+## 24 395.19           1  0.008368201
+## 25     NA           0  0.000000000
+## 26     NA           0 -0.006802721
+## 27 374.96           1 -0.029661017
+## 28 355.99           1 -0.054054054
+## 29 386.29           1 -0.100558659
+## 30 368.84           1 -0.102189781
+## 31 340.77           0 -0.139130435
+## 32     NA           0 -0.140350877
+## 33 384.78           1 -0.143540670
+## 34     NA           0 -0.143939394
+## 35 353.98           1 -0.152173913
+## 36 397.12           1 -0.153526971
+## 37 351.15           1 -0.166666667
+## 38 338.80           0 -0.205607477
+## 39     NA           0 -0.211382114
+## 40     NA           0 -0.260416667
+## 41 380.94           1 -0.279835391
+## 42     NA           0 -0.282051282
+## 43 390.45           1 -0.300411523
+## 44 376.80           1 -0.314410480
+## 45 340.00           0 -0.323529412
+## 46     NA           0 -0.328125000
+## 47 343.99           0 -0.329729730
+## 48     NA           0 -0.353982301
+## 49 355.29           1 -0.367521368
+## 50 346.87           0 -0.370370370
+## 51 352.79           1 -0.386666667
+## 52     NA           0 -0.445454545
+## 53 361.79           1 -0.456410256
+## 54 367.64           1 -0.514184397
+## 55     NA           0 -0.534246575
+## 56     NA           0           NA</code></pre>
+<p><strong>It looks pretty random at first glance. We will attempt to map it later.</strong></p>
+<pre class="r"><code>#Let&#39;s take a look at the time frame of the closer 28 years exclusively to see if it furthers our uncertainty
+climate%&gt;%
+  select(presenthalf, Year, Annual.Increase, Perc_Chg_Inc)%&gt;%
+  filter(presenthalf == 1)%&gt;%
+  glimpse()</code></pre>
+<pre><code>## Rows: 28
+## Columns: 4
+## $ presenthalf     &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ Year            &lt;dbl&gt; 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, …
+## $ Annual.Increase &lt;dbl&gt; 2.70, 2.25, 1.38, 1.17, 0.74, 0.70, 1.23, 1.68, 1.95, …
+## $ Perc_Chg_Inc    &lt;dbl&gt; 1.64705882, -0.16666667, -0.38666667, -0.15217391, -0.…</code></pre>
+<p><strong>We see a lot of negative values which is strange, but it may just be because increases such as the 2.70 ppm increase in 1987 are outlier years and although they increased, it is hard to continue to increase from that number. Thus, the rate of increase declines each year thereafter until another high CO2 increase comes along.</strong></p>
+<pre class="r"><code>#We won&#39;t know much more about the rate of increase until we graph it, so let&#39;s just understand our summary data a bit better!
+library(tidyr)</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.1.2</code></pre>
+<pre class="r"><code>co2summary &lt;- climate%&gt;%
+  summarize(mean_Annual.Increase = mean(Annual.Increase), mean_Mean = mean(Mean, na.rm = TRUE), mean_Perc.Chg.Inc = mean(Perc_Chg_Inc, na.rm = TRUE), sd_Annual.Increase = sd(Annual.Increase), sd_Mean = sd(Mean, na.rm = TRUE), sd_Perc.Chg.Inc = sd(Perc_Chg_Inc, na.rm = TRUE), q1_Annual.Increase = quantile(Annual.Increase, 0.25), q3_Annual.Increase = quantile(Annual.Increase, 0.75), q1_Mean = quantile(Mean, 0.25, na.rm = TRUE), q3_Mean = quantile(Mean, 0.75, na.rm = TRUE), q1_Perc.Chg.Inc = quantile(Perc_Chg_Inc,0.25, na.rm = TRUE), q3_Perc.Chg.Inc = quantile(Perc_Chg_Inc,0.75, na.rm = TRUE)) %&gt;%
+  ungroup()
+co2summary%&gt;%
+  pivot_longer(cols=starts_with(c(&quot;mean&quot;, &quot;sd&quot;, &quot;q1&quot;, &quot;q3&quot;)),names_to = c(&quot;statistic&quot;, &quot;.value&quot;),names_sep = &quot;_&quot;)</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   statistic Annual.Increase  Mean Perc.Chg.Inc
+##   &lt;chr&gt;               &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;
+## 1 mean                1.48  365.         0.109
+## 2 sd                  0.609  17.5        0.496
+## 3 q1                  1.01  352.        -0.281
+## 4 q3                  1.93  380.         0.419</code></pre>
+<p><strong>We see some pretty interesting information hear with our summation of these three variables. The annual increase of CO2 variable’s mean is pretty much right in between the means that we calculated earlier for our two halves of our dataset and our Q1 is just below the mean of our older time frame and our Q3 is just above the mean of our newer time frame. For our mean CO2 variable, the mean of 365.42 ppm is pretty close to our mean of our newer time frame which was 371.12 ppm, especially when considered against the mean of our older time frame which is 342.62 ppm. It is interesting that that mean falls below our Q1 under the bottom 25% of our data. This is probably due to the incompleteness of our data from 1959-1979, and should be relatively ignored. The hole of this data definitely skewed our quartiles for this variable unfortunately.Finally, our percentage increase in ppm per year has a mean that is above 0, .1094 suggesting it is growing, however, the standard deviation of .49588 means that we cannot be unsure that this mean IS actually 0 which is unfortunate. Hopefully the graphs will show a general steady incline in this percentage so we can lean toward it increasing over time!</strong></p>
+</div>
+<div id="creating-visualizations" class="section level1">
+<h1>Creating Visualizations</h1>
+<p><strong>Creating our two visualizations and describing them.</strong></p>
+<pre class="r"><code>#We are going to visualize our percentage change variable and see if it is steadily increasing, or if it doesn&#39;t really have a pattern like the other tests suggest
+library(ggplot2)
+climate%&gt;%
+  ggplot(aes(x=Year, y=Perc_Chg_Inc),na.rm=T)+
+  geom_point(aes(color=Annual.Increase))+
+  labs(title = &quot;Percentage Change in Increase of CO2 Over Time&quot;,
+         x = &quot;Year&quot;,
+         y = &quot;Percentage Change in Annual Increase of CO2 (%)&quot;, color = &quot;Annual Increase in CO2 (ppm)&quot;) +
+  stat_smooth(se=F)+
+  theme_bw()+
+  scale_color_gradient(low = &quot;yellow&quot;, high = &quot;red&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
+<p><img src="/project/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><strong>This plot is very interesting because it shows us that the rate of increase of CO2 ppm globally is not increasing very much, if at all. This tells us that although annually the amount of CO2 ppm in the atmosphere is growing, the increase in annual CO2 is not exponential growth. We can see that as the years get closer to present time, the coloration of our points gets closer to red meaning our annual C02 measurements are growing larger, but only barely. Our smooth line shows us that there is a slight increase in the rate of growth overall, but it is very subtle. Unfortunately, it is hard to quantify and explain this small change which makes it even more difficult to explain the effects this small change has on our environment. The rate of growth in CO2 in the atmosphere seems to be growing, but only barely year by year. Results like these are scary though, because compounded over hundreds of years, these results could be devastating.</strong></p>
+<pre class="r"><code>#We are now going to make a plot that plots every weather anomalie measure over the years and also see its relation with C02 measurements
+climate%&gt;%
+  ggplot(aes(x=Year, alpha=Annual.Increase),na.rm=T)+
+  geom_point(aes(y=Land, color=&quot;Land&quot;))+
+  geom_point(aes(y=Land.and.Ocean, color=&quot;Land.and.Ocean&quot;))+
+  geom_point(aes(y=N.Hem, color=&quot;N.Hem&quot;))+
+  geom_point(aes(y=S.Hem, color=&quot;S.Hem&quot;))+
+  geom_point(aes(y=Band.1, color=&quot;Band.1&quot;))+
+  geom_point(aes(y=Band.2, color=&quot;Band.2&quot;))+
+  geom_point(aes(y=Band.3, color=&quot;Band.3&quot;))+
+  labs(title = &quot;Weather Anomalies Over Time&quot;, x = &quot;Year&quot;, y = &quot;Annual Anomalies in degrees Celsius&quot;, alpha = &quot;Annual Increase in CO2 (ppm)&quot;) +
+  theme_bw()+
+  scale_x_continuous(breaks=seq(1959,2014,5))</code></pre>
+<p><img src="/project/project1_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><strong>This plot depicts the increase in warmer weather anomalies over the years 1959-2014. Prior to around 1970 it looks like colder weather anomalies were more prevalent, but since then, the weather anomalies have been increasingly warmer at every place of measurement. We can also see the points get more shaded in as the increase in C02 gets larger. This trend is unsurprising and although correlation does not imply causation, this correlation does lend itself to the theory of Carbon Dioxide emission climate change.</strong></p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
